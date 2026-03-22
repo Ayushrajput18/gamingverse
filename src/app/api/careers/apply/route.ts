@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from:    `GamingVerse Careers <${FROM_EMAIL}>`,
       to:      process.env.CAREERS_EMAIL ?? 'careers@gamingversestudios.com',
-      replyTo: email,
+      reply_to: email,
       subject: `New Application — ${roleTitle} — ${name}`,
       html: `
         <div style="font-family:monospace;background:#04040a;color:#e8e8f0;padding:32px;max-width:600px;">
