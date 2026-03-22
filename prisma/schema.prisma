@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── User ─────────────────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String?   @unique
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  purchases     Purchase[]
+  wishlist      Wishlist[]
+
+  @@map("users")
+}
+
+// ─── Game ─────────────────────────────────────────────────────────
+model Game {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  subtitle        String?
+  description     String
+  genre           String
+  year            Int
+  status          GameStatus @default(RELEASED)
+  coverImage      String?
+  videoUrl        String?
+  accentColor     String
+  tags            String[]
+  platforms       Platform[]
+  rating          Float?
+  price           Int?      // USD cents
+  stripeProductId String?
+  stripePriceId   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  purchases       Purchase[]
+  wishlistEntries Wishlist[]
+
+  @@map("games")
+}
+
+// ─── Purchase ─────────────────────────────────────────────────────
+model Purchase {
+  id              String   @id @default(cuid())
+  userId          String
+  gameId          String
+  stripeSessionId String   @unique
+  amount          Int      // USD cents
+  currency        String   @default("usd")
+  status          PurchaseStatus @default(PENDING)
+  createdAt       DateTime @default(now())
+
+  user  User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game  Game @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId])
+  @@map("purchases")
+}
+
+// ─── Wishlist ─────────────────────────────────────────────────────
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  gameId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId])
+  @@map("wishlist")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────
+enum GameStatus {
+  RELEASED
+  UPCOMING
+  IN_DEVELOPMENT
+}
+
+enum Platform {
+  PC
+  PLAYSTATION
+  XBOX
+  NINTENDO_SWITCH
+  MOBILE
+}
+
+enum PurchaseStatus {
+  PENDING
+  COMPLETED
+  REFUNDED
+  FAILED
+}

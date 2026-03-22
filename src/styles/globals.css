@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Google Fonts ─────────────────────────────────────────── */
+
+/* ─── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --font-orbitron:   'Orbitron', monospace;
+  --font-rajdhani:   'Rajdhani', sans-serif;
+  --font-share-tech: 'Share Tech Mono', monospace;
+
+  --gv-bg:       #04040a;
+  --gv-surface:  #0a0a14;
+  --gv-surface2: #10101e;
+  --gv-cyan:     #00f5ff;
+  --gv-ember:    #ff4500;
+  --gv-gold:     #ffaa00;
+  --gv-muted:    #6a6a88;
+  --gv-text:     #e8e8f0;
+  --gv-border:   rgba(0, 245, 255, 0.12);
+}
+
+/* ─── Base Reset ────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--gv-bg);
+  color: var(--gv-text);
+  font-family: var(--font-rajdhani);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── Custom Cursor ─────────────────────────────────────────── */
+body * { cursor: none !important; }
+
+/* ─── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: var(--gv-bg); }
+::-webkit-scrollbar-thumb { background: var(--gv-cyan); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gv-ember); }
+
+/* ─── Selection ─────────────────────────────────────────────── */
+::selection { background: rgba(0, 245, 255, 0.2); color: var(--gv-cyan); }
+
+/* ─── Noise texture overlay ─────────────────────────────────── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ─── Scanlines ─────────────────────────────────────────────── */
+.scanlines-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(0, 0, 0, 0.04) 3px, rgba(0, 0, 0, 0.04) 4px
+  );
+}
+
+/* ─── Utility: Skewed clip-path buttons ─────────────────────── */
+.clip-skewed    { clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%); }
+.clip-skewed-sm { clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+
+/* ─── Glow utilities ─────────────────────────────────────────── */
+.glow-cyan  { box-shadow: 0 0 30px rgba(0, 245, 255, 0.4), 0 0 60px rgba(0, 245, 255, 0.15); }
+.glow-ember { box-shadow: 0 0 30px rgba(255, 69, 0, 0.4),  0 0 60px rgba(255, 69, 0, 0.15); }
+.text-glow-cyan { text-shadow: 0 0 20px rgba(0, 245, 255, 0.6); }
+
+/* ─── Section rhythm ─────────────────────────────────────────── */
+.section-padding { padding: 120px 60px; }
+
+@media (max-width: 768px) {
+  .section-padding { padding: 80px 24px; }
+}
+
+/* ─── Scroll-reveal base states ─────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible,
+.reveal-left.visible,
+.reveal-right.visible {
+  opacity: 1;
+  transform: translate(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ─── Hero grid bg ───────────────────────────────────────────── */
+.hero-grid-bg {
+  background-image:
+    linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── Phase 3: GSAP helpers ─────────────────────────────────── */
+
+/* GSAP sets opacity/transform — make sure elements start hidden
+   only if they carry the gsap-hidden class (set by hooks) */
+.gsap-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ScrollTrigger refresh on resize */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+/* Ensure pinned sections stack correctly */
+[data-gsap-pin] {
+  will-change: transform;
+}
+
+/* Smooth font rendering for large GSAP-animated text */
+.hero-title,
+.manifesto-text {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  will-change: transform, opacity;
+}
+
+/* Prevent FOUC on GSAP elements that start invisible */
+.gsap-reveal {
+  opacity: 0;
+}
